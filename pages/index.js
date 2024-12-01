@@ -56,7 +56,7 @@ export default function Home() {
     try {
       const { data, error } = await supabase
         .from("admin")
-        .select("nama, username,email, telepon, img_url")
+        .select("nama, username,email, img_url")
         .eq("id_admin", idAdmin)
         .single();
 
@@ -174,6 +174,18 @@ export default function Home() {
       // 3. Dapatkan id_transaksi dari transaksi yang baru dibuat
       const id_transaksi = transaksi[0].id_transaksi;
 
+      for (const item of orderItems) {
+        const { error: stockError } = await supabase
+          .from("stock_barang")
+          .update({ stock: item.stock - item.quantity })
+          .eq("id_barang", item.id_barang);
+      
+        if (stockError) {
+          console.error(`Error updating stock for item ${item.id_barang}`, stockError);
+        }
+      }
+      
+
       // 4. Persiapkan data untuk transaksi_detail
       const detailData = orderItems.map((item) => ({
         id_transaksi,
@@ -181,12 +193,15 @@ export default function Home() {
         qty: item.quantity,
         harga: item.harga,
         total: item.quantity * item.harga,
+ 
       }));
 
       // 5. Simpan data ke tabel transaksi_detail
       const { error: detailError } = await supabase
         .from("transaksi_detail")
         .insert(detailData);
+
+      
 
       if (detailError) {
         console.error("Error inserting transaksi_detail:", detailError);
@@ -305,8 +320,15 @@ export default function Home() {
     getTodaySales();
     fetchProducts();
     getAllTransactions();
+    if (id) {
+      fetchAdminData(id);
+    }else{
+      // fetchProfile();
+      fetchAdminData(idAdmin);
+      router.push("/login");
+    }
     
-  }, [id,orderItems]);
+  }, [id,orderItems,idAdmin]);
 
   return (
     <div className="w-full h-screen">
