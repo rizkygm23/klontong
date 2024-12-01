@@ -71,7 +71,9 @@ export default function Home() {
       console.error("Unexpected error:", err);
       setAdmin(null);
     } finally {
-      setLoading(false); // Set loading selesai
+      if(id){
+        setLoading(false);
+      }; // Set loading selesai
     }
   };
   const removeItem = (id) => {
@@ -286,6 +288,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    if (id) {
+      fetchAdminData(id);
+    }else{
+      // fetchProfile();
+      fetchAdminData(idAdmin);
+      router.push("/login");
+    }
     const getTodaySales = async () => {
       const sales = await fetchTodaySales();
       setTodaySales(sales);
@@ -296,12 +305,7 @@ export default function Home() {
     getTodaySales();
     fetchProducts();
     getAllTransactions();
-    if (id) {
-      fetchAdminData(id);
-    }else{
-      // fetchProfile();
-      fetchAdminData(idAdmin);
-    }
+    
   }, [id,orderItems]);
 
   return (
@@ -577,4 +581,37 @@ export default function Home() {
       )}
     </div>
   );
+}
+export async function getServerSideProps(context) {
+  const { id } = context.query;
+
+  if (!id) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  const { data: admin, error } = await supabase
+    .from("admin")
+    .select("nama, username, img_url")
+    .eq("id_admin", id)
+    .single();
+
+  if (!admin || error) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      admin,
+    },
+  };
 }
