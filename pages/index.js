@@ -334,12 +334,12 @@ export default function Home() {
     <div className="w-full h-screen">
       <div className=" w-full h-fit py-7 px-5 md:px-24  flex flex-flex-row items-center justify-between">
         <Link href="/login">
-          <button className="bg-[#FFFFFF] w-fit p-4  rounded-md">
+          <button className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md">
             <img src="/back-icon.png" className="h-[24px] w-[24px]" alt="" />
           </button>
         </Link>
         <Link href="/login">
-          <button className="bg-[#FFFFFF] w-fit p-4  rounded-md">
+          <button className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md">
             <img
               src="/profile-icon.png "
               className="h-[24px] w-[24px]"
@@ -372,7 +372,7 @@ export default function Home() {
         <div className=" grid grid-cols-1 h-fit gap-3 w-full  ">
           <div
             id="create-transaction"
-            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white    w-full h-full"
+            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200   w-full h-full"
           >
             <div className=" rounded-full hidden md:block p-4 w-full h-full bg-[#3B3B3B] col-span-1">
               <img
@@ -402,7 +402,7 @@ export default function Home() {
           </div>
           <div
             id="manage-item"
-            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white    w-full h-full"
+            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200    w-full h-full"
           >
             <div className=" rounded-full hidden md:block p-4 w-full h-full bg-[#3B3B3B] col-span-1">
               <img
@@ -459,7 +459,8 @@ export default function Home() {
           </div>
           <div
             id="history-transaction"
-            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white    w-full h-full"
+            onClick={() => router.push("/history")}
+            className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white  hover:bg-slate-200  w-full h-full"
           >
             <div className=" rounded-full hidden md:block p-4 w-full h-full bg-[#3B3B3B] col-span-1">
               <img
@@ -469,7 +470,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
+            <div  className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
               <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] overflow-hidden line-clamp-1">
                 Riwayat Transaksi
               </h1>
