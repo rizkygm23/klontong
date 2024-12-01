@@ -2,10 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+
 
 import "../app/globals.css";
 
 export default function Home() {
+  const router = useRouter();
+  const { id } = router.query; 
   const [products, setProducts] = useState([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalBarang, setTotalBarang] = useState(0);
@@ -19,6 +23,57 @@ export default function Home() {
   const [totalTransactions, setTotalTransactions] = useState(10);
   const [totalTransactionsToday, setTotalTransactionsToday] = useState(0);
 
+  const [admin, setAdmin] = useState(null); // State untuk data admin
+  const [loading, setLoading] = useState(true);
+  const [idAdmin, setIdAdmin] = useState(null);
+
+  // const fetchProfile = async () => {
+    
+  //   const { id } = router.query;
+
+  //   if (id) {
+  //     setIdAdmin(id);
+  //     fetchAdminData(id);
+  //   }
+
+  // }
+
+
+
+
+  const updateTotalOrder = () => {
+    setTotalOrder(
+      orderItems.reduce(
+        (sum, item) => sum + (item.harga || 0) * (item.quantity || 0),
+        0
+      )
+      
+    );
+    console.log(totalOrder);  
+  };
+
+  const fetchAdminData = async (idAdmin) => {
+    try {
+      const { data, error } = await supabase
+        .from("admin")
+        .select("nama, username,email, telepon, img_url")
+        .eq("id_admin", idAdmin)
+        .single();
+
+      if (error) {
+        console.error("Error fetching admin data:", error);
+        setAdmin(null);
+      } else {
+        setAdmin(data);
+        console.log("Data admin:", data); // Set data admin ke state
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setAdmin(null);
+    } finally {
+      setLoading(false); // Set loading selesai
+    }
+  };
   const removeItem = (id) => {
     const filteredItems = orderItems.filter((item) => item.id_barang != id);
     // return filteredItems;
@@ -105,7 +160,7 @@ export default function Home() {
       // 2. Simpan data transaksi ke tabel transaksi
       const { data: transaksi, error: transaksiError } = await supabase
         .from("transaksi")
-        .insert([{ waktu: new Date(), total, id_admin: 17230266 }]) // Admin ID 17230266
+        .insert([{ waktu: new Date(), total, id_admin: id }]) // Admin ID 17230266
         .select();
 
       if (transaksiError) {
@@ -235,11 +290,19 @@ export default function Home() {
       const sales = await fetchTodaySales();
       setTodaySales(sales);
     };
+    // fetchProfile();
+    updateTotalOrder();
 
     getTodaySales();
     fetchProducts();
     getAllTransactions();
-  }, []);
+    if (id) {
+      fetchAdminData(id);
+    }else{
+      // fetchProfile();
+      fetchAdminData(idAdmin);
+    }
+  }, [id,orderItems]);
 
   return (
     <div className="w-full h-screen">
@@ -263,14 +326,14 @@ export default function Home() {
         <div className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full ">
           <div className="flex flex-row  items-center gap-4 p-3 rounded-xl   w-full">
             <img
-              src="/profile-test.png"
+              src={admin?.img_url}
               alt="Profile"
               className="w-14 h-w-14 rounded-full  "
             />
             <div className="grid grid-cols-1  ">
-              <h1 className="text-xl font-bold text-[#3B3B3B]">Yayanaan</h1>
-              <h2 className="text-sm text-gray-600">@warungbuAAN</h2>
-              <p className="text-sm text-gray-500">081218582747</p>
+              <h1 className="text-xl font-bold text-[#3B3B3B]">{admin?.nama}</h1>
+              <h2 className="text-sm text-gray-600">@{admin?.username}</h2>
+              {/* <p className="text-sm text-gray-500">{admin?.email}</p> */}
             </div>
           </div>
           <div className="grid grid-cols-1 items-center  h-full p-3 rounded-xl  text-[#3B3B3B]  w-full">
@@ -294,7 +357,7 @@ export default function Home() {
             </div>
 
             <div onClick={() => setIsModalOpen(true)} className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
-              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B]">
+              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Buat Transaksi
               </h1>
               <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-600 font-bold overflow-hidden">
@@ -324,7 +387,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
-              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B]">
+              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Pengelolaan Barang
               </h1>
               <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-600 font-bold overflow-hidden">
@@ -353,7 +416,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
-              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B]">
+              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Sales Hari Ini
               </h1>
               <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-600 font-bold overflow-hidden">
@@ -381,7 +444,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
-              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B]">
+              <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] overflow-hidden line-clamp-1">
                 Riwayat Transaksi
               </h1>
               <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-600 font-bold overflow-hidden">
@@ -401,7 +464,7 @@ export default function Home() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
             <div className="grid grid-cols-6">
-              <h2 className="text-xl font-bold col-span-5 my-auto">Buat Transaksi</h2>
+              <h2 className="text-xl font-bold col-span-5 my-auto ">Buat Transaksi</h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className=" bg-slate-200 w-fit mx-auto text-white px-4 py-2 rounded"
@@ -457,7 +520,10 @@ export default function Home() {
                       className="flex justify-between items-center gap-3 bg-gray-100 py-3 pr-3 pl-0 rounded shadow"
                     >
                       <button 
-                        onClick={() => removeItem(item.id_barang)}
+                        onClick={() => {removeItem(item.id_barang);
+                          updateTotalOrder();
+                          
+                        }}
                           className="bg-red-300 p-3 h-full rounded shadow">
                         <img
                           src="/x-icon.png"
@@ -487,7 +553,7 @@ export default function Home() {
 
             {/* Tombol Close */}
             <h1 className="text-2xl font-bold mt-6">
-              {formatCurrency(totalOrder).toLocaleString()}
+              {formatCurrency(totalOrder)}
             </h1>
             <div className="grid grid-cols-2 gap-2">
               <button
