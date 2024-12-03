@@ -3,6 +3,8 @@ import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import TransactionChart from "./component/SalesChart";
+
 
 
 import "../app/globals.css";
@@ -332,7 +334,7 @@ export default function Home() {
 
   return (
     <div className="w-full h-screen">
-      <div className=" w-full h-fit py-7 px-5 md:px-24  flex flex-flex-row items-center justify-between">
+      <div className=" w-full h-fit py-7 px-5 md:px-20  flex flex-flex-row items-center justify-between">
         <Link href="/login">
           <button className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md">
             <img src="/back-icon.png" className="h-[24px] w-[24px]" alt="" />
@@ -348,7 +350,7 @@ export default function Home() {
           </button>
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full h-fit px-5 md:px-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full h-fit px-5 md:px-20">
         <div className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full ">
           <div className="flex flex-row  items-center gap-4 p-3 rounded-xl   w-full">
             <img
@@ -487,6 +489,12 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <div className="w-full  bg-slate-70 px-5 md:px-20 mt-6">
+        <TransactionChart />
+
+      </div>
+      <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">

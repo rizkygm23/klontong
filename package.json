@@ -10,13 +10,17 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^5.1.0",
+    "@material-tailwind/html": "^2.3.2",
     "@supabase/supabase-js": "^2.46.2",
     "@tailwindcss/line-clamp": "^0.4.4",
+    "@tremor/react": "^3.18.4",
+    "apexcharts": "^4.1.0",
     "axios": "^1.7.8",
     "bcryptjs": "^2.4.3",
+    "flowbite": "^2.5.2",
     "next": "15.0.3",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
