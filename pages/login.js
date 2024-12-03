@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import "../app/globals.css";
+import Router from "next/router";
 
 const Login = () => {
   const router = useRouter();
@@ -21,18 +22,27 @@ const Login = () => {
 
     try {
       const response = await axios.post("/api/admin/ApiLogin", formData);
-
+    
       if (response.status === 200) {
         const { id_admin } = response.data; // Pastikan API mengembalikan `id_admin`
         // Redirect ke halaman index dengan query parameter id_admin
         router.push(`/?id=${id_admin}`);
       } else {
+        // Jika status bukan 200
         setMessage("Login gagal. Periksa kembali username dan password.");
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      setMessage("Terjadi kesalahan saat login.");
+      // Periksa apakah ada respons dari server
+      if (error.response) {
+        // Tampilkan pesan spesifik dari API
+        setMessage(error.response.data.message || "Login gagal. Coba lagi.");
+      } else {
+        // Kesalahan jaringan atau lainnya
+        console.error("Error during login:", error);
+        setMessage("Terjadi kesalahan jaringan atau server.");
+      }
     }
+    
   };
 
   return (
@@ -71,6 +81,7 @@ const Login = () => {
           />
         </div>
         <p>Belum memiliki akun? <a href="/register" className="text-[#292929]">Daftar disini</a></p>
+        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
         <button
           type="submit"
           className="bg-[#292929] text-white px-4 py-2 rounded mt-4"
@@ -78,7 +89,7 @@ const Login = () => {
           Login
         </button>
       </form>
-      {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+      
     </div>
   );
 };

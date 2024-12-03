@@ -412,7 +412,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
+            <div onClick={() => router.push( "/pengelolaan?id="+id)} className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
               <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Pengelolaan Barang
               </h1>
@@ -459,7 +459,7 @@ export default function Home() {
           </div>
           <div
             id="history-transaction"
-            onClick={() => router.push("/history")}
+            onClick={() => router.push("/history?id=" + id)}
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white  hover:bg-slate-200  w-full h-full"
           >
             <div className=" rounded-full hidden md:block p-4 w-full h-full bg-[#3B3B3B] col-span-1">
@@ -559,7 +559,7 @@ export default function Home() {
                           
                         />
                       </button>
-                      <div>
+                      <div className="w-full">
                         <h3 className="font-semibold text-md line-clamp-1">{item.nama}</h3>
                         <p className="text-gray-500">
                           {item.quantity || 0} x Rp.{" "}
