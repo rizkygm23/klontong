@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import "../app/globals.css";
 import Router from "next/router";
 import { motion } from "framer-motion";
-import { fadeIn } from "./component/Fade";
+import { fadeIn } from "../animation/Fade";
 
 const Login = () => {
   const router = useRouter();

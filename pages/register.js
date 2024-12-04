@@ -3,7 +3,7 @@ import axios from "axios";
 import { useRouter } from "next/router"; // Import useRouter
 import "../app/globals.css";
 import { motion } from "framer-motion";
-import { fadeIn } from "./component/Fade";
+import { fadeIn } from "../animation/Fade";
 
 const RegisterAdmin = () => {
   const router = useRouter(); // Inisialisasi useRouter

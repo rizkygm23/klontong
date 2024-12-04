@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import TransactionChart from "./component/SalesChart";
 import { motion } from "framer-motion";
-import { fadeIn } from "./component/Fade";
+import { fadeIn } from "../animation/Fade";
 
 import "../app/globals.css";
 
