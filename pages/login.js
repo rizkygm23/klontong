@@ -3,6 +3,8 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import "../app/globals.css";
 import Router from "next/router";
+import { motion } from "framer-motion";
+import { fadeIn } from "./component/Fade";
 
 const Login = () => {
   const router = useRouter();
@@ -48,18 +50,38 @@ const Login = () => {
   return (
     <div className=" bg-gray-100 w-full h-screen grid grid-cols-1 md:grid-cols-2 rounded-lg">
         <div className="bg-[#292929] w-full h-full   hidden md:grid px-9">
-            <div className="mx-auto my-auto p-20">
-            <h1 className="text-4xl font-bold  text-slate-100">Selamat datang di StockEase</h1>
-            <h2 className="text-2xl font-medium mt-5 text-white">Jadikan Manajemen Toko Anda Lebih Mudah dengan StockEase</h2>
-            </div>
+            <motion.section
+            variants={fadeIn("up", 0.3)}
+            initial={"hidden"}
+            
+            whileInView={"show"}
+            viewport={{once:false, amount:0.1}}
+            className="mx-auto my-auto p-20">
+            <motion.h1
+            
+            className="text-4xl font-bold  text-slate-100">Selamat datang di StockEase</motion.h1>
+            <motion.h2 className="text-2xl font-medium mt-5 text-white">Jadikan Manajemen Toko Anda Lebih Mudah dengan StockEase</motion.h2>
+            </motion.section>
         
         </div>
       
       
-      <form onSubmit={handleSubmit} className="flex flex-col w-full px-4 md:px-24 lg:px-48 gap-4 mx-auto my-auto">
+      <motion.form
+      variants={fadeIn("up", 0.5)}
+      initial={"hidden"}
+      
+      whileInView={"show"}
+      viewport={{once:false, amount:0.1}}
+      onSubmit={handleSubmit} className="flex flex-col w-full px-4 md:px-24 lg:px-48 gap-4 mx-auto my-auto focus:outline-none active:outline-none focus:bg-current focus:border-current">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
-        <div>
-          <label className="block text-lg font-semibold">Username</label>
+        <motion.div
+        variants={fadeIn("up", 0.7)}
+        initial={"hidden"}
+        
+        whileInView={"show"}
+        viewport={{once:false, amount:0.1}}
+        >
+          <label className="block text-md font-medium">Username</label>
           <input
             type="text"
             name="username"
@@ -68,9 +90,16 @@ const Login = () => {
             className="p-2 border bg-transparent bg-gray-100 rounded w-full"
             required
           />
-        </div>
-        <div>
-          <label className="block text-lg font-semibold">Password</label>
+        </motion.div>
+        <motion.div
+        variants={fadeIn("up", 1)}
+        initial={"hidden"}
+        
+        whileInView={"show"}
+        viewport={{once:false, amount:0.1}}>
+
+        
+          <label className="block text-md font">Password</label>
           <input
             type="password"
             name="password"
@@ -79,16 +108,16 @@ const Login = () => {
             className="p-2 border bg-transparent rounded w-full"
             required
           />
-        </div>
+        </motion.div>
         <p>Belum memiliki akun? <a href="/register" className="text-[#292929]">Daftar disini</a></p>
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
         <button
           type="submit"
-          className="bg-[#292929] text-white px-4 py-2 rounded mt-4"
+          className="bg-[#292929] hover:bg-[#3B3B3B] text-white px-4 py-2 rounded mt-4 hover:rounded-lg"
         >
           Login
         </button>
-      </form>
+      </motion.form>
       
     </div>
   );

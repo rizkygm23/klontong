@@ -4,14 +4,14 @@ import { supabase } from "../lib/supabase";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import TransactionChart from "./component/SalesChart";
-
-
+import { motion } from "framer-motion";
+import { fadeIn } from "./component/Fade";
 
 import "../app/globals.css";
 
 export default function Home() {
   const router = useRouter();
-  const { id } = router.query; 
+  const { id } = router.query;
   const [products, setProducts] = useState([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalBarang, setTotalBarang] = useState(0);
@@ -24,13 +24,54 @@ export default function Home() {
   const [todaySales, setTodaySales] = useState(0);
   const [totalTransactions, setTotalTransactions] = useState(10);
   const [totalTransactionsToday, setTotalTransactionsToday] = useState(0);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const [admin, setAdmin] = useState(null); // State untuk data admin
   const [loading, setLoading] = useState(true);
   const [idAdmin, setIdAdmin] = useState(null);
+  const [editProfile, setEditProfile] = useState({
+    nama: "",
+    username: "",
+    email: "",
+    img_url: "",
+  });
+  const handleOpenProfileModal = () => {
+    setEditProfile({
+      nama: admin?.nama || "",
+      username: admin?.username || "",
+      email: admin?.email || "",
+      img_url: admin?.img_url || "",
+    });
+    setIsProfileModalOpen(true);
+  };
+  const handleSaveProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from("admin")
+        .update({
+          nama: editProfile.nama,
+          username: editProfile.username,
+          email: editProfile.email,
+          img_url: editProfile.img_url,
+        })
+        .eq("id_admin", id);
+
+      if (error) {
+        console.error("Error updating profile:", error);
+        alert("Gagal menyimpan perubahan profil.");
+        return;
+      }
+
+      alert("Profil berhasil diperbarui!");
+      setIsProfileModalOpen(false);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("Terjadi kesalahan. Coba lagi nanti.");
+    }
+  };
 
   // const fetchProfile = async () => {
-    
+
   //   const { id } = router.query;
 
   //   if (id) {
@@ -40,18 +81,14 @@ export default function Home() {
 
   // }
 
-
-
-
   const updateTotalOrder = () => {
     setTotalOrder(
       orderItems.reduce(
         (sum, item) => sum + (item.harga || 0) * (item.quantity || 0),
         0
       )
-      
     );
-    console.log(totalOrder);  
+    console.log(totalOrder);
   };
 
   const fetchAdminData = async (idAdmin) => {
@@ -73,9 +110,9 @@ export default function Home() {
       console.error("Unexpected error:", err);
       setAdmin(null);
     } finally {
-      if(id){
+      if (id) {
         setLoading(false);
-      }; // Set loading selesai
+      } // Set loading selesai
     }
   };
   const removeItem = (id) => {
@@ -181,12 +218,14 @@ export default function Home() {
           .from("stock_barang")
           .update({ stock: item.stock - item.quantity })
           .eq("id_barang", item.id_barang);
-      
+
         if (stockError) {
-          console.error(`Error updating stock for item ${item.id_barang}`, stockError);
+          console.error(
+            `Error updating stock for item ${item.id_barang}`,
+            stockError
+          );
         }
       }
-      
 
       // 4. Persiapkan data untuk transaksi_detail
       const detailData = orderItems.map((item) => ({
@@ -195,15 +234,12 @@ export default function Home() {
         qty: item.quantity,
         harga: item.harga,
         total: item.quantity * item.harga,
- 
       }));
 
       // 5. Simpan data ke tabel transaksi_detail
       const { error: detailError } = await supabase
         .from("transaksi_detail")
         .insert(detailData);
-
-      
 
       if (detailError) {
         console.error("Error inserting transaksi_detail:", detailError);
@@ -265,13 +301,11 @@ export default function Home() {
           ...foundItem,
           quantity: quantity || 1,
         },
-        
       ]);
       setTotalOrder(
         (prevTotal) => prevTotal + (foundItem.harga || 0) * (quantity || 1)
       );
     }
-
 
     // Reset input
     setBarcode("");
@@ -307,7 +341,7 @@ export default function Home() {
   useEffect(() => {
     if (id) {
       fetchAdminData(id);
-    }else{
+    } else {
       // fetchProfile();
       fetchAdminData(idAdmin);
       router.push("/login");
@@ -324,34 +358,42 @@ export default function Home() {
     getAllTransactions();
     if (id) {
       fetchAdminData(id);
-    }else{
+    } else {
       // fetchProfile();
       fetchAdminData(idAdmin);
       router.push("/login");
     }
-    
-  }, [id,orderItems,idAdmin]);
+  }, [id, orderItems, idAdmin]);
 
   return (
     <div className="w-full h-screen">
       <div className=" w-full h-fit py-7 px-5 md:px-20  flex flex-flex-row items-center justify-between">
-        <Link href="/login">
+        <div>
           <button className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md">
             <img src="/back-icon.png" className="h-[24px] w-[24px]" alt="" />
           </button>
-        </Link>
-        <Link href="/login">
-          <button className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md">
+        </div>
+        <div>
+          <button
+            onClick={handleOpenProfileModal}
+            className="bg-[#FFFFFF] hover:bg-slate-200 w-fit p-4  rounded-md"
+          >
             <img
               src="/profile-icon.png "
               className="h-[24px] w-[24px]"
               alt=""
             />
           </button>
-        </Link>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full h-fit px-5 md:px-20">
-        <div className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full ">
+        <motion.div 
+        variants={fadeIn("up", 0.3)}
+        initial={"hidden"}
+        
+        whileInView={"show"}
+        viewport={{once:false, amount:0.1}}
+        className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full ">
           <div className="flex flex-row  items-center gap-4 p-3 rounded-xl   w-full">
             <img
               src={admin?.img_url}
@@ -359,7 +401,9 @@ export default function Home() {
               className="w-14 h-w-14 rounded-full  "
             />
             <div className="grid grid-cols-1  ">
-              <h1 className="text-xl font-bold text-[#3B3B3B]">{admin?.nama}</h1>
+              <h1 className="text-xl font-bold text-[#3B3B3B]">
+                {admin?.nama}
+              </h1>
               <h2 className="text-sm text-gray-600">@{admin?.username}</h2>
               {/* <p className="text-sm text-gray-500">{admin?.email}</p> */}
             </div>
@@ -370,9 +414,14 @@ export default function Home() {
               {formatCurrency(totalAssets)}
             </h1>
           </div>
-        </div>
+        </motion.div>
         <div className=" grid grid-cols-1 h-fit gap-3 w-full  ">
-          <div
+          <motion.div
+            variants={fadeIn("up", 0.4)}
+            initial={"hidden"}
+            
+            whileInView={"show"}
+            viewport={{once:false, amount:0.1}}
             id="create-transaction"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200   w-full h-full"
           >
@@ -384,7 +433,10 @@ export default function Home() {
               />
             </div>
 
-            <div onClick={() => setIsModalOpen(true)} className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
+            <div
+              onClick={() => setIsModalOpen(true)}
+              className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2"
+            >
               <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Buat Transaksi
               </h1>
@@ -401,8 +453,13 @@ export default function Home() {
             >
               <img src="/enter-icon.png" className="h-3" alt="" />
             </button>
-          </div>
-          <div
+          </motion.div>
+          <motion.div
+          variants={fadeIn("up", 0.6)}
+          initial={"hidden"}
+          
+          whileInView={"show"}
+          viewport={{once:false, amount:0.1}}
             id="manage-item"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200    w-full h-full"
           >
@@ -414,7 +471,10 @@ export default function Home() {
               />
             </div>
 
-            <div onClick={() => router.push( "/pengelolaan?id="+id)} className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
+            <div
+              onClick={() => router.push("/pengelolaan?id=" + id)}
+              className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2"
+            >
               <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] line-clamp-1">
                 Pengelolaan Barang
               </h1>
@@ -428,10 +488,15 @@ export default function Home() {
             <button className="bg-[#EEEEEE] w-fit mx-auto p-2 left-0  rounded-full">
               <img src="/enter-icon.png" className="h-3" alt="" />
             </button>
-          </div>
+          </motion.div>
         </div>
         <div className=" grid grid-cols-1 h-fit gap-3 w-full  ">
-          <div
+          <motion.div
+          variants={fadeIn("up", 0.8)}
+          initial={"hidden"}
+          
+          whileInView={"show"}
+          viewport={{once:false, amount:0.1}}
             id="sales-today"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white    w-full h-full"
           >
@@ -458,8 +523,13 @@ export default function Home() {
               alt=""
             />
           </button> */}
-          </div>
-          <div
+          </motion.div>
+          <motion.div
+          variants={fadeIn("up", 1)}
+          initial={"hidden"}
+          
+          whileInView={"show"}
+          viewport={{once:false, amount:0.1}}
             id="history-transaction"
             onClick={() => router.push("/history?id=" + id)}
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white  hover:bg-slate-200  w-full h-full"
@@ -472,7 +542,7 @@ export default function Home() {
               />
             </div>
 
-            <div  className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
+            <div className="grid grid-cols-1 col-span-4 md:col-span-3 pl-2">
               <h1 className=" text-md md:text-lg font-bold text-[#3B3B3B] overflow-hidden line-clamp-1">
                 Riwayat Transaksi
               </h1>
@@ -486,20 +556,101 @@ export default function Home() {
             <button className="bg-[#EEEEEE] w-fit mx-auto p-2 left-0  rounded-full">
               <img src="/enter-icon.png" className="h-3" alt="" />
             </button>
-          </div>
+          </motion.div>
         </div>
       </div>
+      {isProfileModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                  <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
+                    <h2 className="text-xl font-bold mb-4">Edit Profil</h2>
+                    <div className="grid grid-cols-1 gap-4">
+                      <label>Nama</label>
+                      <input
+                        type="text"
+                        value={editProfile.nama}
+                        onChange={(e) =>
+                          setEditProfile({
+                            ...editProfile,
+                            nama: e.target.value,
+                          })
+                        }
+                        className="p-2 border border-gray-300 rounded"
+                      />
+                      <label>Username</label>
+                      <input
+                        type="text"
+                        value={editProfile.username}
+                        onChange={(e) =>
+                          setEditProfile({
+                            ...editProfile,
+                            username: e.target.value,
+                          })
+                        }
+                        className="p-2 border border-gray-300 rounded"
+                      />
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        value={editProfile.email}
+                        onChange={(e) =>
+                          setEditProfile({
+                            ...editProfile,
+                            email: e.target.value,
+                          })
+                        }
+                        className="p-2 border border-gray-300 rounded"
+                      />
+                      <label>Foto Profil (URL)</label>
+                      <input
+                        type="text"
+                        value={editProfile.img_url}
+                        onChange={(e) =>
+                          setEditProfile({
+                            ...editProfile,
+                            img_url: e.target.value,
+                          })
+                        }
+                        className="p-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-end gap-2">
+                      <button
+                        onClick={() => setIsProfileModalOpen(false)}
+                        className="border border-[#3B3B3B] px-4 py-2 rounded"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={handleSaveProfile}
+                        className="bg-[#3B3B3B] px-4 py-2 rounded text-slate-100"
+                      >
+                        Simpan
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-      <div className="w-full  bg-slate-70 px-5 md:px-20 mt-6">
+      <motion.div 
+      variants={fadeIn("up", 1.2)}
+      initial={"hidden"}
+      
+      whileInView={"show"}
+      viewport={{once:false, amount:0.1}}
+      
+      className="w-full  bg-slate-70 px-5 md:px-20 mt-6">
         <TransactionChart />
-
-      </div>
+      </motion.div 
+      
+      >
       <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
             <div className="grid grid-cols-6">
-              <h2 className="text-xl font-bold col-span-5 my-auto ">Buat Transaksi</h2>
+              <h2 className="text-xl font-bold col-span-5 my-auto ">
+                Buat Transaksi
+              </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className=" bg-slate-200 w-fit mx-auto text-white px-4 py-2 rounded"
@@ -546,36 +697,30 @@ export default function Home() {
                 <p className="text-gray-500">Belum ada barang ditambahkan.</p>
               ) : (
                 <ul className="space-y-4">
-                  
                   {orderItems.map((item) => (
-                    
                     <li
-
                       key={item.id_barang}
                       className="flex justify-between items-center gap-3 bg-gray-100 py-3 pr-3 pl-0 rounded shadow"
                     >
-                      <button 
-                        onClick={() => {removeItem(item.id_barang);
+                      <button
+                        onClick={() => {
+                          removeItem(item.id_barang);
                           updateTotalOrder();
-                          
                         }}
-                          className="bg-red-300 p-3 h-full rounded shadow">
-                        <img
-                          src="/x-icon.png"
-                          className="h-3"
-                          alt=""
-                          
-                        />
+                        className="bg-red-300 p-3 h-full rounded shadow"
+                      >
+                        <img src="/x-icon.png" className="h-3" alt="" />
                       </button>
                       <div className="w-full">
-                        <h3 className="font-semibold text-md line-clamp-1">{item.nama}</h3>
+                        <h3 className="font-semibold text-md line-clamp-1">
+                          {item.nama}
+                        </h3>
                         <p className="text-gray-500">
                           {item.quantity || 0} x Rp.{" "}
                           {(item.harga || 0).toLocaleString()}
                         </p>
                       </div>
                       <p className="font-bold">
-                       
                         {formatCurrency(
                           (item.quantity || 0) * (item.harga || 0)
                         ).toLocaleString()}
@@ -584,6 +729,7 @@ export default function Home() {
                   ))}
                 </ul>
               )}
+
             </div>
 
             {/* Tombol Close */}
