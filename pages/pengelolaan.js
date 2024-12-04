@@ -84,7 +84,7 @@ export default function Pengelolaan() {
   const handleModal = (type, item = null) => {
     setModalType(type);
     if (type === "tambah") {
-      setItemData({ id_barang: null, nama: "", stock: 0, harga: 0 });
+      setItemData({  nama: "", stock: 0, harga: 0 });
     } else if (type === "edit" && item) {
       setItemData({
         id_barang: item.id_barang,

@@ -80,7 +80,7 @@ export default function DetailHistory() {
       <div className="px-5 md:px-24 py-7">
         {/* Header */}
         <div className="w-full h-fit flex flex-row items-center justify-between mb-6">
-          <Link href={`/?id=${id}`}>
+          <Link href={`/history?id=${id}`}>
             <button className="bg-white w-fit p-4 rounded-md">
               <img
                 src="/back-icon.png"
@@ -89,7 +89,7 @@ export default function DetailHistory() {
               />
             </button>
           </Link>
-          <Link href="/login">
+          {/* <Link href="/login" className="opacity-0 disabled">
             <button className="bg-white w-fit p-4 rounded-md">
               <img
                 src="/profile-icon.png"
@@ -97,17 +97,17 @@ export default function DetailHistory() {
                 alt="Profile"
               />
             </button>
-          </Link>
+          </Link> */}
         </div>
       </div>
 
       <div className="px-5 md:px-24 py-7 h-full bg-white mx-5 md:mx-24 rounded-md items-center">
-        <h1 className="text-3xl font-bold mb-2">Detail History</h1>
-        <h2 className="text-xl font-medium mb-2">
+        <h1 className=" text-md md:text-3xl font-bold mb-2">Detail History</h1>
+        <h2 className="text-sm md:text-xl font-medium mb-2">
           Detail Transaksi ID: <span className="font-bold">{id_transaksi}</span>
         </h2>
         <div className="w-full p-6 md:p-48">
-          <table className="w-full border-gray-300 text-sm">
+          <table className="w-full border-gray-300 text-xs md:text-sm overflow-hidden">
             <thead>
               <tr>
                 <th>ID Barang</th>
@@ -117,11 +117,11 @@ export default function DetailHistory() {
                 <th>Total</th>
               </tr>
             </thead>
-            <tbody className="text-center">
+            <tbody className="text-center overflow-hidden">
               {transactionDetail.map((item) => (
-                <tr key={item.id_barang}>
+                <tr className="overflow-hidden" key={item.id_barang}>
                   <td className="p-2">{item.id_barang}</td>
-                  <td className="line-clamp-1 p-2">{item.stock_barang.nama}</td>
+                  <td className=" p-2 line-clamp-2 overflow-hidden ">{item.stock_barang.nama}</td>
                   <td className="p-2">{item.qty}</td>
                   <td className="p-2">{item.harga}</td>
                   <td className="p-2">{item.total}</td>
@@ -129,8 +129,8 @@ export default function DetailHistory() {
               ))}
             </tbody>
           </table>
-          <h1 className="mt-9">Total Belanja: Rp <span className="font-bold">{totalBelanja.toLocaleString()}</span></h1>
-          <h2>Nama Admin: {adminName || "Tidak Diketahui"}</h2>
+          <h1 className="mt-9 text-xs md:text-xl">Total Belanja: Rp <span className="font-bold">{totalBelanja.toLocaleString()}</span></h1>
+          <h2 className="text-xs md:text-xl">Nama Admin: {adminName || "Tidak Diketahui"}</h2>
         </div>
       </div>
     </div>

@@ -116,10 +116,10 @@ const TransactionChart = () => {
   return (
     <div className="max-w-full w-full  bg-white rounded-lg shadow dark:bg-gray-800">
       <div className="p-4 md:p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-md md:text-2xl font-bold text-gray-900 dark:text-white">
           Jumlah Transaksi Per Tanggal
         </h2>
-        <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
+        <p className=" text-sm md:text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
           Total Transaksi:{" "}
           <span className="font-semibold text-gray-900 dark:text-white">
             {chartData.reduce((acc, val) => acc + val, 0)} transaksi

@@ -94,11 +94,11 @@ export default function History() {
             <img src="/back-icon.png" className="h-[24px] w-[24px]" alt="Back" />
           </button>
         </Link>
-        <Link href="/login">
+        {/* <Link href="/login">
           <button className="bg-white w-fit p-4 rounded-md">
             <img src="/profile-icon.png" className="h-[24px] w-[24px]" alt="Profile" />
           </button>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Title */}
