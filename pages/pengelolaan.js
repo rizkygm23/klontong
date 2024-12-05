@@ -169,7 +169,7 @@ export default function Pengelolaan() {
     <div className="px-5 md:px-24 py-7">
       {/* Header */}
       <div className="w-full h-fit flex flex-row items-center justify-between mb-6">
-        <Link href={`/?id=${id}`}>
+        <Link href={`/dasboard?id=${id}`}>
           <button className="bg-white w-fit p-4 rounded-md">
             <img
               src="/back-icon.png"
@@ -220,6 +220,12 @@ export default function Pengelolaan() {
             <tr>
               <th
                 className="py-2 px-4 text-left border-b cursor-pointer hover:bg-gray-200"
+                onClick={() => handleSort("id_barang")}
+              >
+                ID
+              </th>
+              <th
+                className="py-2 px-4 text-left border-b cursor-pointer hover:bg-gray-200"
                 onClick={() => handleSort("nama")}
               >
                 Nama Barang
@@ -246,6 +252,9 @@ export default function Pengelolaan() {
                   key={item.id_barang}
                   className="bg-[#E1E1E1] hover:bg-[#c1bfbf]"
                 >
+                  <td className="py-4 px-4 w-fit break-words max-w-[150px] md:max-w-none">
+                    {item.id_barang}
+                  </td>
                   <td className="py-4 px-4 w-fit break-words max-w-[150px] md:max-w-none">
                     {item.nama}
                   </td>

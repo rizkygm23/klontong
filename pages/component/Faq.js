@@ -16,7 +16,7 @@ const DetailItem = ({ question, answer }) => (
               viewport={{once:false, amount:0.1}}
   className="group [&_summary::-webkit-details-marker]:hidden">
     <summary
-      className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-sky-100 dark:bg-[#12122B] p-4 hover:bg-sky-50 text-gray-900 dark:text-slate-100"
+      className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-white dark:bg-[#12122B] p-4 hover:bg-gray-50 text-gray-900 dark:text-slate-100"
     >
       <h2 className="font-medium">{question}</h2>
 
@@ -36,23 +36,24 @@ const DetailItem = ({ question, answer }) => (
 );
 
 const FAQ = () => (
-  <section id="faq" className="pt-36 font-sans  w-full mx-auto pb-96 ">
+  <section id="faq" className="pt-36 font-sans text-sm md:text-base  w-full mx-auto pb-96 ">
     <div className="space-y-4 ">
       <DetailItem 
-        question="What services do you offer as a UI/UX Designer?"
-        answer="I offer a range of services including user research, wireframing, prototyping, user interface design, user experience design, and usability testing. My goal is to create intuitive and engaging digital experiences that meet both user needs and business objectives."
+        question="Apa tujuan dari Aplikasi  ini?"
+        answer="Aplikasi ini bertujuan untuk membantu pemilik warung kelontong mengelola stok barang, transaksi, dan laporan keuangan dengan lebih efisien menggunakan sistem berbasis web."
       />
       <DetailItem 
-        question="What is your experience with blockchain technology?"
-        answer="As a blockchain validator, I have extensive experience in setting up and maintaining blockchain nodes, validating transactions, and ensuring the security and integrity of the blockchain network. I am familiar with various blockchain protocols and consensus mechanisms."
+        question="Bagaimana cara mencatat stok barang?"
+        answer="Admin dapat menambahkan data barang, termasuk nama, kategori, harga, dan jumlah stok awal."
       />
       <DetailItem 
-        question="What tools do you use for UI/UX design?"
-        answer="I use various design tools such as Figma, Sketch, Adobe XD, and InVision for creating wireframes, prototypes, and final designs. Additionally, I use tools like Miro and FigJam for collaborative work and user research."
+        question="Apakah sistem ini dapat mencatat transaksi penjualan?"
+        answer="Ya, semua transaksi penjualan dicatat secara otomatis. Saat barang dijual, stok barang akan berkurang sesuai jumlah yang terjual, dan transaksi dicatat dalam menu transaksi."
       />
       <DetailItem 
-        question="How do you ensure the security of blockchain transactions?"
-        answer="I follow best practices for blockchain security, including implementing robust cryptographic techniques, regularly updating software, monitoring the network for suspicious activities, and following guidelines provided by blockchain protocols to ensure the security and integrity of transactions."
+        question=" Apa keuntungan menggunakan sistem ini?"
+        answer="Efisiensi: Mengurangi waktu yang diperlukan untuk mencatat stok dan transaksi secara manual.
+"
       />
     </div>
   </section>

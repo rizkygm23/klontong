@@ -28,7 +28,7 @@ const Login = () => {
       if (response.status === 200) {
         const { id_admin } = response.data; // Pastikan API mengembalikan `id_admin`
         // Redirect ke halaman index dengan query parameter id_admin
-        router.push(`/?id=${id_admin}`);
+        router.push(`/dasboard?id=${id_admin}`);
       } else {
         // Jika status bukan 200
         setMessage("Login gagal. Periksa kembali username dan password.");

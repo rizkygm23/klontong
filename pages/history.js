@@ -89,7 +89,7 @@ export default function History() {
     <div className="px-5 md:px-24 py-7">
       {/* Header */}
       <div className="w-full h-fit flex flex-row items-center justify-between mb-6">
-        <Link href={`/?id=${id}`}>
+        <Link href={`/dasboard?id=${id}`}>
           <button className="bg-white w-fit p-4 rounded-md">
             <img src="/back-icon.png" className="h-[24px] w-[24px]" alt="Back" />
           </button>
