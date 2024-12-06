@@ -103,6 +103,12 @@ export default function Pengelolaan() {
     try {
       const { error } = await supabase.from("stock_barang").insert([itemData]);
 
+      if (!itemData.nama || itemData.stock === 0 || itemData.harga === 0) {
+        alert("Nama, stock, dan harga harus diisi.");
+        return;
+        
+      }
+
       if (error) {
         console.error("Error adding barang:", error);
         alert("Gagal menambahkan barang.");
@@ -119,6 +125,11 @@ export default function Pengelolaan() {
 
   // Fungsi untuk mengedit barang
   const handleEditBarang = async () => {
+    if (!itemData.nama || itemData.stock === 0 || itemData.harga === 0) {
+      alert("Nama, stock, dan harga harus diisi.");
+      return
+      
+    }
     try {
       const { error } = await supabase
         .from("stock_barang")
@@ -179,7 +190,7 @@ export default function Pengelolaan() {
           </button>
         </Link>
         <Link href="/login">
-          <button className="bg-white w-fit p-4 rounded-md">
+          <button className="bg-white w-fit p-4 rounded-md hidden disabaled">
             <img
               src="/profile-icon.png"
               className="h-[24px] w-[24px]"
@@ -262,7 +273,7 @@ export default function Pengelolaan() {
                     Rp {item.harga.toLocaleString()}
                   </td>
                   <td className="py-4 px-4">{item.stock}</td>
-                  <td className="px-4 flex flex-wrap gap-2 mt-3">
+                  <td className="px-1 md:px-4 flex flex-wrap gap-2 mt-3">
                     <button
                       onClick={() => handleModal("edit", item)}
                       className="bg-yellow-500 text-white px-3 py-2 rounded-md"
@@ -314,17 +325,23 @@ export default function Pengelolaan() {
               </>
             )}
             {modalType !== "hapus" && (
-              <div className="flex flex-col gap-4">
-                <input
+              <div className="flex flex-col gap-2">
+                <label className="text-sm mt-1">ID Barang</label>
+                <input 
+                
+                
                   type="text"
                   placeholder="Nama Barang"
                   className="p-2 border border-gray-300 rounded-md"
                   value={itemData.nama}
                   onChange={(e) =>
+                    
                     setItemData({ ...itemData, nama: e.target.value })
                   }
                 />
+                <label className="text-sm mt-1">Stock</label>
                 <input
+                required
                   type="number"
                   placeholder="Stock"
                   className="p-2 border border-gray-300 rounded-md"
@@ -336,6 +353,7 @@ export default function Pengelolaan() {
                     })
                   }
                 />
+                <label className="text-sm mt-1">Harga</label>
                 <input
                   type="number"
                   placeholder="Harga"
@@ -354,7 +372,7 @@ export default function Pengelolaan() {
               {modalType === "tambah" && (
                 <button
                   onClick={handleAddBarang}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  className="bg-[#292929] text-white px-4 py-2 rounded-md"
                 >
                   Tambah
                 </button>

@@ -8,17 +8,17 @@ export default async function handler(req, res) {
 
   const { nama,id_admin, username, password, email, img_url } = req.body;
 
-  // Validasi input
+  
   if (!nama || !username || !password || !email || !img_url) {
     return res.status(400).json({ error: "Semua field harus diisi." });
   }
 
   try {
-    // Enkripsi password
+    
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Simpan data ke Supabase
+    
     const { error } = await supabase.from("admin").insert({
       id_admin,
       nama,

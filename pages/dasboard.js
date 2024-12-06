@@ -269,7 +269,7 @@ export default function Home() {
     // Validasi barcode
     const foundItem = products.find((item) => item.id_barang == trimmedBarcode);
 
-    if (!foundItem) {
+    if (!foundItem || foundItem.stock <= 0) {
       setError("ID Barang tidak valid.");
       return;
     }
