@@ -100,14 +100,16 @@ export default function Pengelolaan() {
 
   // Fungsi untuk menambahkan barang
   const handleAddBarang = async () => {
+
+    if(itemData.stock === 0 || itemData.harga === 0 || itemData.nama === "") {
+      alert("Nama, stock, dan harga harus diisi.");
+      return;
+    }
+    
     try {
       const { error } = await supabase.from("stock_barang").insert([itemData]);
 
-      if (!itemData.nama || itemData.stock === 0 || itemData.harga === 0) {
-        alert("Nama, stock, dan harga harus diisi.");
-        return;
-        
-      }
+      
 
       if (error) {
         console.error("Error adding barang:", error);
@@ -121,6 +123,15 @@ export default function Pengelolaan() {
       console.error("Unexpected error:", err);
       alert("Terjadi kesalahan saat menambahkan barang.");
     }
+    if (!itemData.nama || itemData.stock === 0 || itemData.harga === 0) {
+      alert("Nama, stock, dan harga harus diisi.");
+      
+      return;
+      
+    }else {
+
+    }
+    
   };
 
   // Fungsi untuk mengedit barang
