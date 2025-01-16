@@ -13,12 +13,14 @@ import "../app/globals.css";
 export default function Home() {
   const router = useRouter();
   const { id } = router.query;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [products, setProducts] = useState([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalBarang, setTotalBarang] = useState(0);
   const [totalOrder, setTotalOrder] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [barcode, setBarcode] = useState(0); // Input barcode/ID Barang
+  const [barcode, setBarcode] = useState("0"); // Input barcode/ID Barang
   const [quantity, setQuantity] = useState(1); // Input quantity (default 1)
   const [orderItems, setOrderItems] = useState([]); // Data pesanan sementara
 
@@ -37,73 +39,25 @@ export default function Home() {
     email: "",
     img_url: "",
   });
-  const startScanner = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: "environment" } })
-      .then((stream) => {
-        console.log("Camera stream started");
-        videoRef.current.srcObject = stream; // Sambungkan stream kamera ke elemen video
-        videoRef.current.play(); // Putar video
-      })
-      .catch((err) => {
-        console.error("Error accessing camera:", err);
-      });
-    Quagga.init(
-      {
-        inputStream: {
-          name: "Live",
-          type: "LiveStream",
-          target: videoRef.current, // Target elemen video
-          constraints: {
 
-            facingMode: "environment", // Gunakan kamera belakang
-          },
-        },
-        decoder: {
-          readers: [
-            "ean_reader", // Untuk EAN-13/EAN-8
-            "code_128_reader", // Untuk CODE-128
-            "upc_reader", // Untuk UPC
-          ], // Tipe barcode yang didukung
-        },
-        locator: {
-          // Mengatur ukuran pencarian kotak barcode
-          patchSize: "medium",
-          halfSample: true,
-        },
-        debug: {
-          drawBoundingBox: true, // Menampilkan kotak pembatas
-          showFrequency: true,   // Menampilkan frekuensi pemrosesan frame
-          showSkeleton: true,    // Menampilkan skelett (kerangka) barcode
-          showLabels: true,      // Menampilkan label deteksi di sekitar barcode
-          boxColor: { border: "green", background: "rgba(0, 255, 0, 0.5)" }, // Warna kotak
-          labelColor: { border: "green", background: "rgba(0, 255, 0, 0.7)" }, // Warna label
-        },
-      },
-      (err) => {
-        if (err) {
-          console.error("Error initializing Quagga:", err);
-          setError("Error initializing camera");
-          return;
-        }
-        console.log("Camera initialized");
-        Quagga.start();
+  const fetchBarangSuggestions = async (term) => {
+    try {
+      const { data, error } = await supabase
+        .from("stock_barang")
+        .select("id_barang, nama")
+        .ilike("nama", `%${term}%`); // Mencari barang berdasarkan nama yang mengandung input
+
+      if (error) {
+        setError("Error fetching data");
+        return;
       }
-    );
-  
-    Quagga.onProcessed((result) => {
-      if (result && result.boxes) {
-        console.log("Processing frame...");
-      }
-    });
-  
-    Quagga.onDetected((data) => {
-      console.log("Barcode detected:", data.codeResult.code);
-      setBarcode(data.codeResult.code);
-      Quagga.stop();
-    });
+
+      setSuggestions(data || []); // Menyimpan hasil pencarian
+    } catch (error) {
+      setError("Terjadi kesalahan: " + error.message);
+    }
   };
-  
+
   const handleOpenProfileModal = () => {
     setEditProfile({
       nama: admin?.nama || "",
@@ -334,7 +288,7 @@ export default function Home() {
   const handleAddItem = () => {
     setError(""); // Reset error
 
-    const trimmedBarcode = barcode.trim(); // Bersihkan input
+    const trimmedBarcode = barcode; // Bersihkan input
     // Validasi barcode
     const foundItem = products.find((item) => item.id_barang == trimmedBarcode);
 
@@ -420,6 +374,12 @@ export default function Home() {
       fetchAdminData(idAdmin);
       router.push("/login");
     }
+    if (barcode.length >= 3) {
+      fetchBarangSuggestions(barcode);
+    } else {
+      setSuggestions([]); // Kosongkan jika input kurang dari 3 karakter
+    }
+
     const getTodaySales = async () => {
       const sales = await fetchTodaySales();
       setTodaySales(sales);
@@ -437,7 +397,7 @@ export default function Home() {
       fetchAdminData(idAdmin);
       router.push("/login");
     }
-  }, [id, orderItems, idAdmin]);
+  }, [id, orderItems, idAdmin, barcode]);
 
   return (
     <div className="w-full h-screen">
@@ -728,26 +688,33 @@ export default function Home() {
 
             {/* Form Input */}
             <div className="grid grid-cols-1  gap-4">
-              <label className="text-lg font-semibold">
-                Barcode / ID Barang:
-              </label>
-              <div className="grid grid-cols-1 gap-2 h-96:">
+              <label className="text-lg font-semibold">id/nama Barang:</label>
+
               <input
-                type="number"
+                type="text"
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 className="p-2 border border-gray-300 rounded"
-                placeholder="Masukkan ID Barang"
+                placeholder="Masukkan ID/nama barang Barang"
               />
-              <button
-                onClick={startScanner}
-                className="bg-blue-500 text-white px-4 py-2 rounded ml-2"
-              >
-                Scan Barcode
-              </button>
-              <video className="w-full h-full max-h-32 object-cover" ref={videoRef} autoPlay />
-              </div>
-              
+              {suggestions.length > 0 && (
+                <div className=" bg-white border border-gray-300 rounded  w-full max-h-36 overflow-scroll">
+                  {suggestions.map((item) => (
+                    <div
+                      key={item.id_barang}
+                      onClick={() => {
+
+                        setBarcode(item.id_barang);
+                        setSuggestions([]);
+                      }}
+                      className="p-2 hover:bg-gray-200 cursor-pointer w-full"
+                    >
+                      {item.nama}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="border border-gray-300 rounded mt-2" />
               <label className="text-lg font-semibold">Quantity:</label>
               <div className="grid grid-cols-2 gap-2">
@@ -769,12 +736,12 @@ export default function Home() {
             </div>
 
             {/* Pesanan Sementara */}
-            <div className="mt-6 max-h-[300px] overflow-y-auto">
+            <div className="mt-6 max-h-[160px] overflow-y-auto">
               <h2 className="text-xl font-bold mb-4">Pesanan Sementara</h2>
               {orderItems.length === 0 ? (
                 <p className="text-gray-500">Belum ada barang ditambahkan.</p>
               ) : (
-                <ul className="space-y-4">
+                <ul className="space-y-4 ">
                   {orderItems.map((item) => (
                     <li
                       key={item.id_barang}
