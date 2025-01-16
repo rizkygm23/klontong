@@ -731,6 +731,7 @@ export default function Home() {
               <label className="text-lg font-semibold">
                 Barcode / ID Barang:
               </label>
+              <div className="grid grid-cols-1 gap-2 h-96:">
               <input
                 type="number"
                 value={barcode}
@@ -744,7 +745,9 @@ export default function Home() {
               >
                 Scan Barcode
               </button>
-              <video ref={videoRef} autoPlay />
+              <video className="w-full h-full max-h-32 object-cover" ref={videoRef} autoPlay />
+              </div>
+              
               <div className="border border-gray-300 rounded mt-2" />
               <label className="text-lg font-semibold">Quantity:</label>
               <div className="grid grid-cols-2 gap-2">
