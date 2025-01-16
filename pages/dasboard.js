@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import TransactionChart from "./component/SalesChart";
 import { motion } from "framer-motion";
 import { fadeIn } from "../animation/Fade";
+import Quagga from "quagga";
 
 import "../app/globals.css";
 
@@ -20,12 +21,13 @@ export default function Home() {
   const [barcode, setBarcode] = useState(0); // Input barcode/ID Barang
   const [quantity, setQuantity] = useState(1); // Input quantity (default 1)
   const [orderItems, setOrderItems] = useState([]); // Data pesanan sementara
-  const [error, setError] = useState("");
+
   const [todaySales, setTodaySales] = useState(0);
   const [totalTransactions, setTotalTransactions] = useState(10);
   const [totalTransactionsToday, setTotalTransactionsToday] = useState(0);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
+  const [error, setError] = useState("");
+  const videoRef = useRef(null);
   const [admin, setAdmin] = useState(null); // State untuk data admin
   const [loading, setLoading] = useState(true);
   const [idAdmin, setIdAdmin] = useState(null);
@@ -35,6 +37,57 @@ export default function Home() {
     email: "",
     img_url: "",
   });
+  const startScanner = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: "environment" } })
+      .then((stream) => {
+        console.log("Camera stream started");
+        videoRef.current.srcObject = stream; // Sambungkan stream kamera ke elemen video
+        videoRef.current.play(); // Putar video
+      })
+      .catch((err) => {
+        console.error("Error accessing camera:", err);
+      });
+    Quagga.init(
+      {
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: videoRef.current, // Target elemen video
+          constraints: {
+            width: 640, // Resolusi kamera
+            height: 480,
+            facingMode: "environment", // Gunakan kamera belakang
+          },
+        },
+        decoder: {
+          readers: ["ean_reader", "code_128_reader"], // Tipe barcode yang didukung
+        },
+      },
+      (err) => {
+        if (err) {
+          console.error("Error initializing Quagga:", err);
+          setError("Error initializing camera");
+          return;
+        }
+        console.log("Camera initialized");
+        Quagga.start();
+      }
+    );
+  
+    Quagga.onProcessed((result) => {
+      if (result && result.boxes) {
+        console.log("Processing frame...");
+      }
+    });
+  
+    Quagga.onDetected((data) => {
+      console.log("Barcode detected:", data.codeResult.code);
+      setBarcode(data.codeResult.code);
+      Quagga.stop();
+    });
+  };
+  
   const handleOpenProfileModal = () => {
     setEditProfile({
       nama: admin?.nama || "",
@@ -274,6 +327,11 @@ export default function Home() {
       return;
     }
 
+    if (quantity > foundItem.stock) {
+      setError("Quantity melebihi stok.");
+      return;
+    }
+
     // Tambahkan ke pesanan sementara
     const existingItem = orderItems.find(
       (item) => item.id_barang == trimmedBarcode
@@ -387,13 +445,13 @@ export default function Home() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full h-fit px-5 md:px-20">
-        <motion.div 
-        variants={fadeIn("up", 0.3)}
-        initial={"hidden"}
-        
-        whileInView={"show"}
-        viewport={{once:false, amount:0.1}}
-        className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full ">
+        <motion.div
+          variants={fadeIn("up", 0.3)}
+          initial={"hidden"}
+          whileInView={"show"}
+          viewport={{ once: false, amount: 0.1 }}
+          className=" lg:grid grid-cols-1 h-fit gap-3 hidden w-full "
+        >
           <div className="flex flex-row  items-center gap-4 p-3 rounded-xl   w-full">
             <img
               src={admin?.img_url}
@@ -419,9 +477,8 @@ export default function Home() {
           <motion.div
             variants={fadeIn("up", 0.4)}
             initial={"hidden"}
-            
             whileInView={"show"}
-            viewport={{once:false, amount:0.1}}
+            viewport={{ once: false, amount: 0.1 }}
             id="create-transaction"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200   w-full h-full"
           >
@@ -455,11 +512,10 @@ export default function Home() {
             </button>
           </motion.div>
           <motion.div
-          variants={fadeIn("up", 0.6)}
-          initial={"hidden"}
-          
-          whileInView={"show"}
-          viewport={{once:false, amount:0.1}}
+            variants={fadeIn("up", 0.6)}
+            initial={"hidden"}
+            whileInView={"show"}
+            viewport={{ once: false, amount: 0.1 }}
             id="manage-item"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white hover:bg-slate-200    w-full h-full"
           >
@@ -492,11 +548,10 @@ export default function Home() {
         </div>
         <div className=" grid grid-cols-1 h-fit gap-3 w-full  ">
           <motion.div
-          variants={fadeIn("up", 0.8)}
-          initial={"hidden"}
-          
-          whileInView={"show"}
-          viewport={{once:false, amount:0.1}}
+            variants={fadeIn("up", 0.8)}
+            initial={"hidden"}
+            whileInView={"show"}
+            viewport={{ once: false, amount: 0.1 }}
             id="sales-today"
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white    w-full h-full"
           >
@@ -525,11 +580,10 @@ export default function Home() {
           </button> */}
           </motion.div>
           <motion.div
-          variants={fadeIn("up", 1)}
-          initial={"hidden"}
-          
-          whileInView={"show"}
-          viewport={{once:false, amount:0.1}}
+            variants={fadeIn("up", 1)}
+            initial={"hidden"}
+            whileInView={"show"}
+            viewport={{ once: false, amount: 0.1 }}
             id="history-transaction"
             onClick={() => router.push("/history?id=" + id)}
             className="grid grid-cols-5  items-center   p-3 rounded-xl bg-white  hover:bg-slate-200  w-full h-full"
@@ -560,89 +614,86 @@ export default function Home() {
         </div>
       </div>
       {isProfileModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                  <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
-                    <h2 className="text-xl font-bold mb-4">Edit Profil</h2>
-                    <div className="grid grid-cols-1 gap-4">
-                      <label>Nama</label>
-                      <input
-                        type="text"
-                        value={editProfile.nama}
-                        onChange={(e) =>
-                          setEditProfile({
-                            ...editProfile,
-                            nama: e.target.value,
-                          })
-                        }
-                        className="p-2 border border-gray-300 rounded"
-                      />
-                      <label>Username</label>
-                      <input
-                        type="text"
-                        value={editProfile.username}
-                        onChange={(e) =>
-                          setEditProfile({
-                            ...editProfile,
-                            username: e.target.value,
-                          })
-                        }
-                        className="p-2 border border-gray-300 rounded"
-                      />
-                      <label>Email</label>
-                      <input
-                        type="email"
-                        value={editProfile.email}
-                        onChange={(e) =>
-                          setEditProfile({
-                            ...editProfile,
-                            email: e.target.value,
-                          })
-                        }
-                        className="p-2 border border-gray-300 rounded"
-                      />
-                      <label>Foto Profil (URL)</label>
-                      <input
-                        type="text"
-                        value={editProfile.img_url}
-                        onChange={(e) =>
-                          setEditProfile({
-                            ...editProfile,
-                            img_url: e.target.value,
-                          })
-                        }
-                        className="p-2 border border-gray-300 rounded"
-                      />
-                    </div>
-                    <div className="mt-4 flex justify-end gap-2">
-                      <button
-                        onClick={() => setIsProfileModalOpen(false)}
-                        className="border border-[#3B3B3B] px-4 py-2 rounded"
-                      >
-                        Batal
-                      </button>
-                      <button
-                        onClick={handleSaveProfile}
-                        className="bg-[#3B3B3B] px-4 py-2 rounded text-slate-100"
-                      >
-                        Simpan
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
+            <h2 className="text-xl font-bold mb-4">Edit Profil</h2>
+            <div className="grid grid-cols-1 gap-4">
+              <label>Nama</label>
+              <input
+                type="text"
+                value={editProfile.nama}
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    nama: e.target.value,
+                  })
+                }
+                className="p-2 border border-gray-300 rounded"
+              />
+              <label>Username</label>
+              <input
+                type="text"
+                value={editProfile.username}
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    username: e.target.value,
+                  })
+                }
+                className="p-2 border border-gray-300 rounded"
+              />
+              <label>Email</label>
+              <input
+                type="email"
+                value={editProfile.email}
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    email: e.target.value,
+                  })
+                }
+                className="p-2 border border-gray-300 rounded"
+              />
+              <label>Foto Profil (URL)</label>
+              <input
+                type="text"
+                value={editProfile.img_url}
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    img_url: e.target.value,
+                  })
+                }
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setIsProfileModalOpen(false)}
+                className="border border-[#3B3B3B] px-4 py-2 rounded"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                className="bg-[#3B3B3B] px-4 py-2 rounded text-slate-100"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <motion.div 
-      variants={fadeIn("up", 1.2)}
-      initial={"hidden"}
-      
-      whileInView={"show"}
-      viewport={{once:false, amount:0.1}}
-      
-      className="w-full  bg-slate-70 px-5 md:px-20 mt-6">
-        <TransactionChart />
-      </motion.div 
-      
+      <motion.div
+        variants={fadeIn("up", 1.2)}
+        initial={"hidden"}
+        whileInView={"show"}
+        viewport={{ once: false, amount: 0.1 }}
+        className="w-full  bg-slate-70 px-5 md:px-20 mt-6"
       >
+        <TransactionChart />
+      </motion.div>
       <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -671,6 +722,14 @@ export default function Home() {
                 className="p-2 border border-gray-300 rounded"
                 placeholder="Masukkan ID Barang"
               />
+              <button
+                onClick={startScanner}
+                className="bg-blue-500 text-white px-4 py-2 rounded ml-2"
+              >
+                Scan Barcode
+              </button>
+              <video ref={videoRef} autoPlay />
+              <div className="border border-gray-300 rounded mt-2" />
               <label className="text-lg font-semibold">Quantity:</label>
               <div className="grid grid-cols-2 gap-2">
                 <input
@@ -729,7 +788,6 @@ export default function Home() {
                   ))}
                 </ul>
               )}
-
             </div>
 
             {/* Tombol Close */}

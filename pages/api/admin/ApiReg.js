@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if (error) {
       console.error("Supabase Error:", error);
-      return res.status(500).json({ error: "Gagal menyimpan admin." });
+      return res.status(500).json({ error: "Terjadi kesalahan pada server." });
     }
 
     res.status(201).json({ message: "Admin berhasil terdaftar." });

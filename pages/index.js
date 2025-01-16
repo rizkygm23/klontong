@@ -209,6 +209,9 @@ const landingpages = () => {
     <p className="mx-auto text-center text-sm md:text-lg text-[#292929]">Copyright © {new Date().getFullYear()} - All right reserved</p>
     
   </aside>
+  {/* <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+  Tailwind Button
+</button> */}
 
 </footer>
 
