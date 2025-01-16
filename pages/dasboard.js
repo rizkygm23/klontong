@@ -55,8 +55,7 @@ export default function Home() {
           type: "LiveStream",
           target: videoRef.current, // Target elemen video
           constraints: {
-            width: 640, // Resolusi kamera
-            height: 480,
+
             facingMode: "environment", // Gunakan kamera belakang
           },
         },
@@ -66,6 +65,19 @@ export default function Home() {
             "code_128_reader", // Untuk CODE-128
             "upc_reader", // Untuk UPC
           ], // Tipe barcode yang didukung
+        },
+        locator: {
+          // Mengatur ukuran pencarian kotak barcode
+          patchSize: "medium",
+          halfSample: true,
+        },
+        debug: {
+          drawBoundingBox: true, // Menampilkan kotak pembatas
+          showFrequency: true,   // Menampilkan frekuensi pemrosesan frame
+          showSkeleton: true,    // Menampilkan skelett (kerangka) barcode
+          showLabels: true,      // Menampilkan label deteksi di sekitar barcode
+          boxColor: { border: "green", background: "rgba(0, 255, 0, 0.5)" }, // Warna kotak
+          labelColor: { border: "green", background: "rgba(0, 255, 0, 0.7)" }, // Warna label
         },
       },
       (err) => {
