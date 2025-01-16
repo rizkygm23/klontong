@@ -61,7 +61,11 @@ export default function Home() {
           },
         },
         decoder: {
-          readers: ["ean_reader", "code_128_reader"], // Tipe barcode yang didukung
+          readers: [
+            "ean_reader", // Untuk EAN-13/EAN-8
+            "code_128_reader", // Untuk CODE-128
+            "upc_reader", // Untuk UPC
+          ], // Tipe barcode yang didukung
         },
       },
       (err) => {
