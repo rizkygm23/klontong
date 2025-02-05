@@ -593,6 +593,11 @@ export default function Home() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-auto">
             <h2 className="text-xl font-bold mb-4">Edit Profil</h2>
+            <img
+              src={editProfile.img_url}
+              alt="Profile"
+              className="w-20 h-20 mx-auto mb-4 rounded-full"
+            />
             <div className="grid grid-cols-1 gap-4">
               <label>Nama</label>
               <input

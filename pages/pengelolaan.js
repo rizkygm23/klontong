@@ -264,7 +264,7 @@ export default function Pengelolaan() {
               >
                 Stock
               </th>
-              <th className="py-2 px-4 text-left border-b">Aksi</th>
+              <th className="py-2 px-4 w-fit border-b text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -274,37 +274,40 @@ export default function Pengelolaan() {
                   key={item.id_barang}
                   className="bg-[#E1E1E1] hover:bg-[#c1bfbf]"
                 >
-                  <td className="py-4 px-4 w-fit break-words max-w-[150px] md:max-w-none">
+                  <td className=" px-1 py-1 md:py-3 md:px-3 w-fit break-words max-w-[150px] md:max-w-none">
                     {item.id_barang}
                   </td>
-                  <td className="py-4 px-4 w-fit break-words max-w-[150px] md:max-w-none">
+                  <td className=" px-1 py-1 md:py-3 md:px-3 w-fit break-words max-w-[150px] md:max-w-none">
                     {item.nama}
                   </td>
-                  <td className="py-4 px-4">
+                  <td className=" px-1 py-1 md:py-3 md:px-3">
                     Rp {item.harga.toLocaleString()}
                   </td>
-                  <td className="py-4 px-4">{item.stock}</td>
-                  <td className="px-1 md:px-4 flex flex-wrap gap-2 mt-3">
+                  <td className=" px-1 py-1 md:py-2 md:px-2">{item.stock}</td>
+                  <td className="px-1 md:px-4 flex items-center">
+                    <div className="flex flex-col md:flex-row gap-2 h-[50px] mx-auto">
                     <button
                       onClick={() => handleModal("edit", item)}
-                      className="bg-yellow-500 text-white px-3 py-2 rounded-md"
+                      className="bg-yellow-500 text-white px-1 py-1 md:px-6 md:py-2  rounded-md"
                     >
                       <img
                         src="/edit-icon.png"
-                        className="w-[12px]"
+                        className=" w-2 md:w-[18px]"
                         alt="Edit"
                       />
                     </button>
                     <button
                       onClick={() => handleModal("hapus", item)}
-                      className="bg-red-500 text-white px-3 py-2 rounded-md"
+                      className="bg-red-500 text-white px-1 py-1 md:px-6 md:py-2 rounded-md"
                     >
                       <img
                         src="/delete-icon.png"
-                        className="w-[12px]"
+                        className="w-2 md:w-[18px]"
                         alt="Delete"
                       />
                     </button>
+                    </div>
+
                   </td>
                 </tr>
               ))
